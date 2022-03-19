@@ -1,23 +1,16 @@
 [
   {
     "Id": "1",
-    "Title": "Go tutorial",
-    "Description": "This is a video",
-    "Imageurl": "image.youtube.com",
-    "Url": "youtube.com"
+    "Title": "Updated title",
+    "Description": "Updated description",
+    "Imageurl": "updated url",
+    "Url": "Updated image url"
   },
   {
     "Id": "2",
-    "Title": "Go tutorial 2",
-    "Description": "This is a second video",
-    "Imageurl": "image2.youtube.com",
-    "Url": "youtube.com"
-  },
-  {
-    "Id": "3",
-    "Title": "Youtube video 3",
-    "Description": "Youtube video 3",
-    "Imageurl": "youtube.video3.com",
-    "Url": "youtube.image3.png"
+    "Title": "Updated title",
+    "Description": "Updated description",
+    "Imageurl": "updated url",
+    "Url": "Updated image url"
   }
 ]
