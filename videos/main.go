@@ -35,6 +35,24 @@ func main() {
 	//add description
 	addDesc := addCmd.String("desc", "", "Youtube video Description")
 
+	//UPDTAE COMMAND
+	updateCmd := flag.NewFlagSet("update", flag.ExitOnError)
+
+	//add id
+	updateId := updateCmd.String("id", "", "Youtube video id")
+
+	//update title
+	updateTitle := updateCmd.String("title", "", "Youtube video title")
+
+	//update url
+	updateUrl := updateCmd.String("url", "", "Youtube video url")
+
+	//update imageUrl
+	updateImageUrl := updateCmd.String("imageUrl", "", "Youtube video Image Url")
+
+	//update description
+	updateDesc := updateCmd.String("desc", "", "Youtube video Description")
+
 	if len(os.Args) < 2 {
 		fmt.Println("expected 'get or 'add' subcommands")
 		os.Exit(1)
@@ -45,10 +63,24 @@ func main() {
 		handleGet(getCmd, getAll, getId)
 	case "add":
 		handleAdd(addCmd, addId, addTitle, addUrl, addImageUrl, addDesc)
+	case "update":
+		handleUpdate(updateCmd, updateId, updateTitle, updateUrl, updateImageUrl, updateDesc)
 	default:
 
 	}
 
+}
+
+func checkFileExist() string {
+	_, err := os.Stat("videos-updated.json")
+	if err != nil {
+		panic(err)
+	}
+	if os.IsNotExist(err) {
+		return "videos.json"
+	} else {
+		return "videos-updated.json"
+	}
 }
 
 func handleGet(getCmd *flag.FlagSet, all *bool, id *string) {
@@ -65,7 +97,8 @@ func handleGet(getCmd *flag.FlagSet, all *bool, id *string) {
 	//If --all
 	if *all {
 		//return all videos
-		videos := getVideos()
+		pathname := checkFileExist()
+		videos := getVideos(pathname)
 		fmt.Printf("ID \t Title \t URL \t ImageURL \t Description \n")
 		for _, video := range videos {
 			fmt.Printf("%v \t %v \t %v \t %v \t %v \t \n", video.Id, video.Title, video.Url, video.Imageurl, video.Description)
@@ -75,7 +108,7 @@ func handleGet(getCmd *flag.FlagSet, all *bool, id *string) {
 
 	//If --id
 	if *id != "" {
-		videos := getVideos()
+		videos := getVideos("./videos.json")
 		id := *id
 
 		for _, video := range videos {
@@ -89,14 +122,14 @@ func handleGet(getCmd *flag.FlagSet, all *bool, id *string) {
 	}
 }
 
-func ValidateVideoInput(addCmd *flag.FlagSet, id *string, title *string, imageUrl *string, url *string, desc *string) {
+func ValidateVideoInput(validateCmd *flag.FlagSet, id *string, title *string, imageUrl *string, url *string, desc *string) {
 
 	//Ignore the add flag, take the rest (starting from -id)
-	addCmd.Parse(os.Args[2:])
+	validateCmd.Parse(os.Args[2:])
 
 	if *id == "" || *title == "" || *url == "" || *imageUrl == "" || *desc == "" {
-		fmt.Print("all fields are required for adding a video")
-		addCmd.PrintDefaults()
+		fmt.Print("Missing required fields \n")
+		validateCmd.PrintDefaults()
 		os.Exit(1)
 	}
 }
@@ -113,8 +146,28 @@ func handleAdd(addCmd *flag.FlagSet, id *string, title *string, imageUrl *string
 		Url:         *url,
 	}
 
-	videos := getVideos()
+	pathname := checkFileExist()
+	videos := getVideos(pathname)
 	videos = append(videos, video)
 
+	saveVideos(videos)
+}
+
+func handleUpdate(updateCmd *flag.FlagSet, id *string, title *string, imageUrl *string, url *string, desc *string) {
+	ValidateVideoInput(updateCmd, id, title, imageUrl, url, desc)
+	//Find the video's id and update
+	//We want to get videos-updated.json if it exists
+	pathname := checkFileExist()
+	videos := getVideos(pathname)
+
+	for i, video := range videos {
+		if *id == video.Id {
+			//update video
+			videos[i].Title = *title
+			videos[i].Imageurl = *imageUrl
+			videos[i].Url = *url
+			videos[i].Description = *desc
+		}
+	}
 	saveVideos(videos)
 }
